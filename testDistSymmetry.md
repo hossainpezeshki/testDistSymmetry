@@ -1,0 +1,395 @@
+---
+title: "A Statistical Test of the Symmetry of the Stock Returns Distributions"
+author: "Dr. Hossain Pezeshki"
+date: '2015-07-08'
+output: html_document
+css: style.css
+bibliography: bibliography.bib
+---
+****
+
+# Prompt and Summary #
+A recent online [article](http://www.bloombergview.com/articles/2015-06-25/fear-factor-drives-the-stock-market-s-highs-and-lows) [@skewbbg] reports the existence of negative skewness in the
+distribution of (some) stock returns, and we decided to test this assertion.
+That is, we decided to test stock returns data for symmetry.
+Commonly, the statistical [skewness](#skewreview) is used for this purpose. However, in order for
+skewness to be meaningful at all, the distribution must have finite third order moments.
+Furthermore the test of significance of sample skewness requires the existence of bounded moments
+of sixth order. Thus, the fact that the observed return distributions are often
+heavy-tailed [page 87 @ruppertfinance] makes skewness inappropriate
+for the task at hand, and a different test is needed. We [propose such a test](#newtest)
+after [reviewing the skewness metric](#skewreview).
+
+Although our primary focus is finance, our discussion is broadly applicable to large sample statistics.
+
+***
+
+## Skewness and its requirement of bounded moments  <a name="skewreview"></a> ##
+Let $x = [x_1, x_2,\ldots,
+x_N]$ be a sample from a population governed by the pdf $f_X()$. Then, 
+if $\int_{\mathbb{R}} \left|r \right|^3 f_X(r)\,dr < \infty$, define
+the population skewness $\gamma_3$ by
+$$
+\gamma_3 \stackrel{\Delta}{=}
+E \left(  
+\dfrac{X - \mu_1}{\sqrt{\mu_2}}
+\right)^3
+$$
+where $\mu_1 = EX$ and $\mu_2 = \mbox{Var}(X)$. The corresponding sample estimate
+skewness $\Gamma_{3,N}$ is given by
+$$
+\Gamma_{3,N}
+\stackrel{\Delta}{=}
+\dfrac{1}{N} \sum_{i=1}^{N} \left(
+\dfrac{x_i - m_N}{s_N}
+\right)^3
+$$ 
+where $m_N$ and $s_N$ are the sample mean and standard deviation respectively.
+By the strong law of large number $\Gamma_{3,N} \rightarrow \gamma_3$ as $N \rightarrow \infty$.
+Clearly if $f_X()$ is symmetric then $\gamma_3 \equiv 0$, so that
+$\left|\Gamma_{3,N}\right|$
+can be used as a test statistic since its large values betoken asymmetry.
+The critical values for this test come from the asymptotic noramlity 
+of $\Gamma_{3,N}$.
+It is shown on pages 386--387 of @lehmannlargesample that
+$$
+\sqrt{N}\,(\Gamma_{3,N} - \gamma_3) \rightarrow N(0,b)\;\;
+\mbox{where}\;\;
+b \stackrel{\Delta}{=}
+\dfrac{
+\mu_6 - 6 \mu_2 \mu_4 - \mu_3^2 + 9 \mu_2^3 
+}
+{\mu_2^3}
+$$
+where $\mu_k \stackrel{\Delta}{=} E\left(X - EX)\right)^k\;$ for $k \in \{2,3,4,5,6\}$.
+
+***
+
+
+# A different test of symmetry <a name="newtest"></a> #
+Let $f_X$ and $F_X$ be the population probability density function and cumulative
+distribution function respectively.
+Considering the (potential) heaviness of the tails of $f_X$, we can only reasonably
+assume boundedness of the first moment
+$\int_{\mathbb{R}} \left|r \right| f_X(r)\,dr < \infty$. That is, the expectation
+$EX$ is finite. We propose using as the test statistic the absolute value of the difference between
+the sample mean and sample median normalized by an indication of the _scale_ parameter;
+that is, $T_N$ as defined below:
+
+$$
+T_N \stackrel{\Delta}{=}
+\dfrac{\left|m_N  - \zeta_{1/2,N}\right|}
+{R_N}
+\;\;\mbox{where}\;\;
+R_N \stackrel{\Delta}{=} \dfrac{\zeta_{3/4,N} - \zeta_{1/4,N}}
+{2 \times 0.6745}
+$$
+where by $\zeta_{p,N}$ we mean the the $p$'th sample quantile.
+Our choice of $R_N$ is motivated by the discussion on page 86 of @serfling where
+in particular the strange looking denominator of $R_N$ is explained.
+Large values of $T_N$ suggest rejecting the null hypothesis:
+$$ H_0 : \;\;f_X\;\;\mbox{is symmetric}$$
+
+Clearly we need to approximate the distribution of $T_N$ under $H_0$; to this
+end we use a trick suggested by @hinkley and proceed as follows:
+Let $F_N$
+be the empirical cumulative distribution function of the data  $x = [x_1, x_2,\ldots,
+x_N]$. By the authority of the Gilvenko-Cantelli theorem [@probandmeasure page 269],
+$F_N$ is an approximation of $F_X$.
+Create a _new_ data set $y = [y_1, y_2,\ldots,y_N]$ by setting
+$$ y_i \stackrel{\Delta}{=} 2\,\zeta_{1/2,N} - x_i \;\;\mbox{for}\;\; i \in \{1,\ldots,N\}$$
+and let $G_N$ be the empirical cdf of $y$.
+If the null hypothesis $H_0$ is true, then $G_N$ is also an approximation of $F_X$.
+Consequently, under $H_0$, the cumulative distribution function $K_N$ defined by
+$$ K_N = \dfrac{1}{2} F_N + \dfrac{1}{2} G_N $$
+is also an approximation of $F_X$. Observe that $K_N$ is the empirical CDF
+of the data vector $w$ that we obtain by concatenating the vectors $x$ and $y$
+as $w \stackrel{\Delta}{=} [x_1,\ldots,x_N, y_1,\ldots, y_N]$.
+Clearly $K_N$ is a symmetric distribution.
+We can therefore approximate the null distribution of our test statistic $T_N$
+by forming bootstrap samples
+$$w_1^\ast, w_2^\ast,\ldots,w_B^\ast$$
+from $w$ 
+and applying $T_N$ to each bootstrap sample to obtain
+$$T_{N,1}^\ast, T_{N,2}^\ast,\ldots,
+T_{N,B}^\ast$$
+The corresponding _basic bootstrap_ $p$-value for $T_N$ is given by
+
+$$ p_N^\ast \stackrel{\Delta}{=} \dfrac{1 + \sum_{i=1}^{B} \mathbb{1}\left(
+T_{N,i}^\ast \geq T_N
+\right)}
+{1 + B}
+$$ 
+The above basic bootstrap estimate can be improved upon by using antithetic variance reduction
+and balanced bootstrap, as the following implementation in [`R 3.2.0`](http://www.R-project.org)
+[@theRlang]
+does.
+
+
+```r
+rm (list = ls())
+require (gtools)
+
+lu <- defmacro (j, k, expr={
+  c((k*(j-1)+1):(k*j))
+})
+
+symmetry.statfunc <- function (y) {
+  mu <- mean (y);
+  md <- median (y);
+  tmp <- quantile (x=y, probs=c(1/4, 3/4));
+  s <- (tmp[2] - tmp[1])/ (2 * 0.6745);  # Indication of scale
+  val <- abs (mu - md) / s;
+  names (val) <- NULL
+  val;
+}
+
+symmetryTest <- function (x, B = 1000) {
+  stopifnot (class(x) == "numeric")
+  result <- list();
+  result$statistic <- symmetry.statfunc (x);
+  result$mu <- mean(x);
+  result$md <- median(x);
+  tmp <- quantile (x=x, probs=c(1/4, 3/4));
+  result$scale  <- (tmp[2] - tmp[1])/ (2 * 0.6745);  # Indication of scale
+  names (result$scale) <- NULL
+  
+  Hnull = c(x, (2*median(x)-x)) # This is the symmetrized data which is our proxy for H0
+  
+  # Note the use of balanced as opposed to ordinary bootstrap,
+  # together with the use of antithetic variates.
+  # Page 493 of Hinkley et al. exercise 21
+  halfB = as.integer (B/2);
+  direct.val = rep (0.0, halfB)
+  anti.val = rep (0.0, halfB)
+  
+  BI <- rep (c(1:length(Hnull)), halfB);
+  II <- sample (x=BI, size=length(BI), replace=FALSE)
+  
+  for (i in 1:halfB) {
+    idx = lu (i, length(Hnull))
+    jdx = II[idx]
+    direct.val[i] = symmetry.statfunc(Hnull[jdx])
+    
+    jdx = (length(Hnull)+1) - jdx
+    anti.val[i] = symmetry.statfunc (Hnull[jdx])
+  }
+  
+  val = c (direct.val, anti.val)
+  result$p.val <- (1 + sum (val >= result$statistic))/(1+B);
+ 
+  result
+}
+```
+
+***
+
+## Experimenting with known distribution <a name="experimenting"></a> ##
+To gauge the performance of [the above procedure](#newtest) we first try it on simulated data
+with
+known asymmetry (or symmetry). The following plot shows the pdf of the stable
+law with characteristic index $\alpha = 1.4$ 
+and skew parameter $\beta=0.45$ as well as the symmetric stable law with $\alpha=1.4$ (i.e. $\beta=0$).
+Neither distribution has
+finite variance (A reference on stable laws is @bigstablebook).
+
+<a name="stablesfig"></a>
+![plot of chunk unnamed-chunk-2](figure/unnamed-chunk-2-1.png) 
+
+We simulate samples corresponding to the above two distribution and subject them to our [test](#newtest).
+
+```r
+set.seed (35384)
+data = rstable (n=300, alpha=alpha, beta=0.0)
+res = symmetryTest (data, B=2000)
+print (res$p.val)
+```
+
+```
+## [1] 0.287856071964
+```
+As expected, there is no evidence against symmetry for the blue density.
+
+
+```r
+set.seed (35384)
+print (beta)
+```
+
+```
+## [1] 0.45
+```
+
+```r
+data = rstable (n=300, alpha=alpha, beta=beta)
+res = symmetryTest (data, B=2000)
+print (res$p.val)
+```
+
+```
+## [1] 0.0189905047476
+```
+As expected, the test rejects $H_0$ for the red density
+in the [above figure](#stablesfig).
+
+Next we apply the [test](#newtest) to data simulated from $t$ distribution
+with $\mbox{df}=2.1$, with non-centrality parameter $\mbox{nc}=0$ and
+$\mbox{nc}=0.45$, which are plotted below. Both $t_{\mbox{df}=2.1}$ and
+$t_{\mbox{df}=2.1, \mbox{nc}=0.45}$ have unbounded third moments. Note
+that we have centred the non-central $t$ pdf at its mean so as to highlight
+the difference of skewnesses of the two pdf's.
+
+<a name="students"></a>
+![plot of chunk unnamed-chunk-5](figure/unnamed-chunk-5-1.png) 
+
+
+```r
+set.seed (35384)
+print (df)
+```
+
+```
+## [1] 2.1
+```
+
+```r
+data = rt (n=300, df=df)
+print (symmetryTest (data)$p.val)
+```
+
+```
+## [1] 0.985014985015
+```
+As expected there is no evidence of asymmetry for the blue curve.
+
+```r
+set.seed (35384)
+print (ncp)
+```
+
+```
+## [1] 0.45
+```
+
+```r
+data = rt (n=300, df=df, ncp=ncp)
+print (symmetryTest (data)$p.val)
+```
+
+```
+## [1] 0.014985014985
+```
+But the test rejects the red curve.
+
+***
+
+# Trying the test out on market data <a name="marketdata"></a>#
+We use the [quantmod](http://CRAN.R-project.org/package=quantmod) [@quantmod] package of R 3.2.0 to
+download market data from [Yahoo Finance Canada](https://ca.finance.yahoo.com/).
+
+```r
+rm (list = ls())
+library (quantmod)
+source ("./getTicker.R") # This is a just a convenient wrapper for getSymbols{quantmod}
+source ("symmetryTest.R") 
+set.seed (38535)
+```
+Let us try the [S&P 500](https://en.wikipedia.org/wiki/S&P_500) daily log-returns
+for the past two years.
+
+```r
+SNP500 <- getTicker (sym="^GSPC", freq="daily", from="2013-07-10", to="2015-07-10")
+SNP500$symTest = symmetryTest (SNP500$rt, B=2000)
+print (SNP500$symTest$p.val)
+```
+
+```
+## [1] 0.508745627186
+```
+There is no evidence of asymmetry in S&P 500 returns.
+Next we try [PowerShares QQQ Trust, Series 1](https://ca.finance.yahoo.com/q?s=QQQ&ql=1)
+daily log-returns for the same period.
+
+```r
+getTicker (sym="QQQ", auto.assign=TRUE,
+           freq="daily", from="2013-07-10", to="2015-07-10")
+QQQ$symTest = symmetryTest (QQQ$rt, B=2000)
+print (QQQ$symTest$p.val)
+```
+
+```
+## [1] 0.0899550224888
+```
+
+```r
+sprintf ("QQQ daily log returns: mean=%.4f, median=%.4f", QQQ$symTest$mu, QQQ$symTest$md) 
+```
+
+```
+## [1] "QQQ daily log returns: mean=0.0008, median=0.0012"
+```
+There is evidence of asymmetry in
+[QQQ](https://ca.finance.yahoo.com/q?s=QQQ&ql=1) daily log-returns, and the claim of negative skewness
+made in
+the cited [article](http://www.bloombergview.com/articles/2015-06-25/fear-factor-drives-the-stock-market-s-highs-and-lows) is verified since the mean is less than the median.
+However, there does not appear to be any strong indication of negative skewness of daily log-returns 
+of IBM and Microsoft for the same period:
+
+```r
+getTicker (sym="IBM", auto.assign=TRUE,
+           freq="daily", from="2013-07-10", to="2015-07-10")
+IBM$symTest = symmetryTest (IBM$rt, B=2000)
+print (IBM$symTest$p.val)
+```
+
+```
+## [1] 0.543728135932
+```
+
+```r
+getTicker (sym="MSFT", auto.assign=TRUE,
+           freq="daily", from="2013-07-10", to="2015-07-10")
+MSFT$symTest = symmetryTest (MSFT$rt, B=2000)
+print (MSFT$symTest$p.val)
+```
+
+```
+## [1] 0.100949525237
+```
+For the [S&P/TSX Composite Index](https://en.wikipedia.org/wiki/S&P/TSX_Composite_Index)
+of the [Toronto Stock Exchange](https://en.wikipedia.org/wiki/Toronto_Stock_Exchange),
+there appears to be a very strong evidence of negative skewness since the p-value
+is small and the mean is less than the median:
+
+```r
+TSE = getTicker (sym="^GSPTSE",
+           freq="daily", from="2013-07-10", to="2015-07-10")
+TSE$symTest = symmetryTest (TSE$rt, B=2000)
+print (TSE$symTest$p.val)
+```
+
+```
+## [1] 0.000499750124938
+```
+
+```r
+sprintf ("TSX daily log returns: mean=%.4f, median=%.4f", TSE$symTest$mu, TSE$symTest$md) 
+```
+
+```
+## [1] "TSX daily log returns: mean=0.0003, median=0.0008"
+```
+
+***
+
+# Conclusion #
+Presence of asymmetry and negative skewness in the distribution of the log-returns
+of stocks and stocks indices is not necessarily universally true, and should be
+tested on a case-by-case basis.
+
+***
+
+# References #
+
+
+
